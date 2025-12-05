@@ -4,6 +4,7 @@ package org.example.day3
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.fold
 import org.example.utils.resourceLines
@@ -30,8 +31,8 @@ data class Bank(
 
     private fun findTopVoltages(n: Int): List<Int> {
         val result = mutableListOf<Int>()
-        val rightStack = ArrayDeque<Int>(batteries.takeLast(n).map { it.voltage })
-        var leftStack = ArrayDeque<Int>(batteries.take(batteries.size - n).map { it.voltage })
+        val rightStack = ArrayDeque(batteries.takeLast(n).map { it.voltage })
+        var leftStack = ArrayDeque(batteries.take(batteries.size - n).map { it.voltage })
 
         while (rightStack.isNotEmpty()) {
             val right = rightStack.removeFirst()
@@ -79,7 +80,7 @@ suspend fun runPart(fileName: String, batteries: Int = 2) {
                     Bank(line.map { Battery(it.digitToInt()) })
                 )
             }
-        }.flatMapConcat {
+        }.flatMapMerge {
             flow {
                 emit(it.calculateTotalOutputVoltage(batteries))
             }
